@@ -5,33 +5,42 @@
 #include "Solve.h"
 
 using namespace std;
+// 1 -5 6 5 -6 два действительных корня
 
-//std::invalid_argument a == 0
-//std::domain_error - нет действительных корней
+void HandleInput(double& a, double& b, double& c, double& d, double& e, string const& inputLine)
+{
+    stringstream ss(inputLine);
+    ss >> a >> b >> c >> d >> e;
+    if (ss.fail())
+    {
+        throw runtime_error("Too few args");
+    }
+    if (!ss.eof())
+    {
+        throw runtime_error("Too many args");
+    }
+}
 
 int main()
 {
     double a, b, c, d, e;
-    string inputLine, msg = "Enter coefficients of the equation ax^4 + bx^3 + cx^2 + dx + e = 0:";
-    cout << msg << endl;
+    string inputLine, startMessage = "Enter coefficients of the equation ax^4 + bx^3 + cx^2 + dx + e = 0:";
+    cout << startMessage << endl;
     while(getline(cin, inputLine))
     {
-        stringstream ss(inputLine);
-        ss >> a >> b >> c >> d >> e;
-        if (ss.fail())
+        try
         {
-            cout << "Too few args" << endl << msg << endl;
-            continue;
+            HandleInput(a, b, c, d, e, inputLine);
         }
-        if (!ss.eof())
+        catch (runtime_error const& ex)
         {
-            cout << "Too many args" << endl << msg << endl;
+            cout << ex.what() << endl << startMessage << endl;
             continue;
         }
         try
         {
             EquationRoot4 res = Solve4(a, b, c, d, e);
-            cout << "res: " << res.numRoots << endl;
+            cout << "Solutions count: " << res.numRoots << endl;
             copy(res.roots.begin(), res.roots.end(), ostream_iterator<double>(cout, " "));
             cout << endl;
         }
@@ -43,7 +52,7 @@ int main()
         {
             cout << ex.what() << endl;
         }
-        cout << msg << endl;
+        cout << startMessage << endl;
     }
     return EXIT_SUCCESS;
 }
